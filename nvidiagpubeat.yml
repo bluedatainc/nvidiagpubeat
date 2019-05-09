@@ -24,9 +24,9 @@
 
 nvidiagpubeat:
   # Defines how often an event is sent to the output
-  period: 5s
+  period: 30s
   query: "utilization.gpu,utilization.memory,memory.total,memory.free,memory.used,temperature.gpu,pstate"
-  env: "test"
+  env: "production"
   # env can be test or production. test is for test purposes to evaluate funcationality of this beat. Switch to production
   # when you want to run this beat on a Nvidia GPU machine with SMI driver installed.
 
@@ -44,6 +44,14 @@ nvidiagpubeat:
 # output.
 #fields:
 #  env: staging
+
+#==================== Elasticsearch template setting ==========================
+
+setup.template.json.enabled: true
+setup.template.overwrite: true
+setup.template.enabled: true
+setup.template.json.path: "nvidiagpubeat.template.json"
+setup.template.json.name: "nvidiagpubeat-6.5.5"
 
 #================================ Outputs =====================================
 

@@ -64,7 +64,7 @@ done
 export PATH=$PATH:/opt/go/bin
 
 #Clone and build the go-daemon
-GIT_SSL_NO_VERIFY=true git clone -b $GO_DAEMON_BRANCH https://github.com/bluedatainc/go-daemon
+GIT_SSL_NO_VERIFY=true git clone -b $GO_DAEMON_BRANCH git@github.com:bluedatainc/go-daemon.git
 
 cd go-daemon
 # Compile the go-daemon

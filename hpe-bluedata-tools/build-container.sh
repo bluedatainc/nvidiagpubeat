@@ -1,5 +1,11 @@
 #!/bin/bash
 #
+# Author:  Anne Marie Merritt anne.merritt@hpe.com
+#
+# With many pieces borrowed from the monitoring container image build and
+# generalized for any Dockerfile build. Grateful thanks to those who have
+# gone before to provide me with such a great start to build on.
+#
 # Builds epic/<containername> image
 #
 # Usage:

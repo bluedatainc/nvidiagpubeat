@@ -63,7 +63,7 @@ func (g BDLink) run(cmd *exec.Cmd, action Action) (map[int]string, error) {
 
 		// No links -> GPUs not assigned
 		if len(line) == 0 {
-			logp.Debug("nvidiagpubeat: %s", "No links found")
+			logp.Debug("nvidiagpubeat", "No links found")
 			return nil, nil
 		}
 
@@ -71,7 +71,7 @@ func (g BDLink) run(cmd *exec.Cmd, action Action) (map[int]string, error) {
 		devLinkName := strings.TrimSpace(devLink[0])
 		gpuNumStr := re.FindString(strings.TrimSpace(devLink[1]))
 		if len(gpuNumStr) == 0 {
-			logp.Warn("nvidiagpubeat", "Bad formatted device name: %s", devLink[1])
+			logp.Debug("nvidiagpubeat", "Bad formatted device name: %s", devLink[1])
 			continue
 		}
 		gpuIndex, _ := strconv.Atoi(gpuNumStr)

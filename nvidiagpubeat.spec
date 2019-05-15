@@ -2,7 +2,7 @@
 Summary: nvidiagpubeat
 Name: nvidiagpubeat
 Version: 6.5.5
-Release: 1
+Release: 3
 License: Apache
 Source: %{expand:%%(pwd)}
 BuildRoot: %{_topdir}/BUILD/%{name}-%{version}-%{release}

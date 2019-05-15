@@ -61,7 +61,7 @@ func (g Utilization) run(cmd *exec.Cmd, gpuCount int, query string, action Actio
 	bdLinkCmd := bdLink.command()
 	links, err := bdLink.run(bdLinkCmd, NewLocal())
 	if err != nil {
-		return nil, errors.New("Unable to fetch node symbolic links: Error " + err.Error())	
+		return nil, errors.New("Unable to fetch node symbolic links: Error " + err.Error())
 	}
 	logp.Debug("nvidiagpubeat", "NodeLinks: %v", links)
 
@@ -93,12 +93,23 @@ func (g Utilization) run(cmd *exec.Cmd, gpuCount int, query string, action Actio
 		linkName, ok := links[gpuIndex]
 		if !ok {
 			linkName = ""
-		} 
+		}
+
+		var containerName string
+
+		if linkName == "" {
+			containerName = ""
+		} else {
+			containerName = linkName[:strings.LastIndex(linkName, "-")]
+		}
+
+		containerId := GetContainerId(containerName)
 		headers := strings.Split(query, ",")
 		event := common.MapStr{
-			"linkName": linkName,
-			"gpuIndex": gpuIndex,
-			"type":     "nvidiagpubeat",
+			"linkName":    linkName,
+			"containerId": containerId,
+			"gpuIndex":    gpuIndex,
+			"type":        "nvidiagpubeat",
 		}
 		for i := 0; i < len(record); i++ {
 			value, _ := strconv.Atoi(record[i])

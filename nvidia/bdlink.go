@@ -18,8 +18,10 @@
 package nvidia
 
 import (
-	"io"
-	"os/exec"
+	//"io"
+	"io/ioutil"
+	"os"
+	//"os/exec"
 	"regexp"
 	"strconv"
 	"strings"
@@ -28,10 +30,13 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
+const (
+	bdLinkPath = "/opt/bluedata/dev"
+)
+
 //BDLink_I provides interface to container name to GPU device links.
 type BDLink_I interface {
-	command(env string) *exec.Cmd
-	run(cmd *exec.Cmd, gpuCount int, query string, action Action) ([]common.MapStr, error)
+	getBDDevLinks(linkPath string) ([]common.MapStr, error)
 }
 
 //BDLink implements one flavour of BDLink interface.
@@ -43,41 +48,39 @@ func newBDLink() BDLink {
 	return BDLink{}
 }
 
-func (g BDLink) command() *exec.Cmd {
-	cmd := "ls -ln /opt/bluedata/dev | grep ^l | awk '{print $9\",\"$11}'"
-	return exec.Command("bash", "-c", cmd)
-}
-
-//Run the ls command to collect bd GPU dev links
-//Parse output and return array of link names.
-func (g BDLink) run(cmd *exec.Cmd, action Action) (map[int]string, error) {
-	reader := action.start(cmd)
+func (g BDLink) getBDDevLinks(linkPath string) (map[int]string, error) {
 	re := regexp.MustCompile(`\d+\z`)
 	links := make(map[int]string)
 
-	for {
-		line, err := reader.ReadString('\n')
-		if err == io.EOF {
-			break
-		}
-
-		// No links -> GPUs not assigned
-		if len(line) == 0 {
-			logp.Debug("nvidiagpubeat", "No links found")
-			return nil, nil
-		}
-
-		devLink := strings.Split(line, ",")
-		devLinkName := strings.TrimSpace(devLink[0])
-		gpuNumStr := re.FindString(strings.TrimSpace(devLink[1]))
-		if len(gpuNumStr) == 0 {
-			logp.Debug("nvidiagpubeat", "Bad formatted device name: %s", devLink[1])
-			continue
-		}
-		gpuIndex, _ := strconv.Atoi(gpuNumStr)
-		links[gpuIndex] = devLinkName
-
+	files, err := ioutil.ReadDir(linkPath)
+	if err != nil {
+		return nil, err
 	}
-	cmd.Wait()
+
+	if len(files) == 0 {
+		logp.Debug("nvidiagpubeat", "No links found")
+		return nil, nil
+	}
+
+	for _, fileInfo := range files {
+		if fileInfo.Mode()&os.ModeSymlink != 0 {
+			fullLinkName := linkPath + "/" + fileInfo.Name()
+			srcFileName, err := os.Readlink(fullLinkName)
+
+			if err != nil {
+				logp.Debug("nvidiagpubeat", "Error reading symbolic link %s: %s", fullLinkName, err.Error())
+				continue
+			}
+
+			gpuNumStr := re.FindString(strings.TrimSpace(srcFileName))
+			if len(gpuNumStr) == 0 {
+				logp.Debug("nvidiagpubeat", "Bad formatted device name: %s", srcFileName)
+				continue
+			}
+			gpuIndex, _ := strconv.Atoi(gpuNumStr)
+			links[gpuIndex] = fileInfo.Name()
+		}
+	}
+
 	return links, nil
 }

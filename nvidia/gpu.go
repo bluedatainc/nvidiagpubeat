@@ -58,8 +58,9 @@ func (g Utilization) run(cmd *exec.Cmd, gpuCount int, query string, action Actio
 	gpuIndex := 0
 	events := make([]common.MapStr, gpuCount, 2*gpuCount)
 	bdLink := newBDLink()
-	bdLinkCmd := bdLink.command()
-	links, err := bdLink.run(bdLinkCmd, NewLocal())
+	links, err := bdLink.getBDDevLinks(bdLinkPath)
+	//bdLinkCmd := bdLink.command()
+	//links, err := bdLink.run(bdLinkCmd, NewLocal())
 	if err != nil {
 		return nil, errors.New("Unable to fetch node symbolic links: Error " + err.Error())
 	}

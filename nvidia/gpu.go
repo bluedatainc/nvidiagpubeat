@@ -26,6 +26,7 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 //GPUUtilization provides interface to utilization metrics and state of GPU.
@@ -56,6 +57,14 @@ func (g Utilization) run(cmd *exec.Cmd, gpuCount int, query string, action Actio
 	reader := action.start(cmd)
 	gpuIndex := 0
 	events := make([]common.MapStr, gpuCount, 2*gpuCount)
+	bdLink := newBDLink()
+	links, err := bdLink.getBDDevLinks(bdLinkPath)
+	//bdLinkCmd := bdLink.command()
+	//links, err := bdLink.run(bdLinkCmd, NewLocal())
+	if err != nil {
+		return nil, errors.New("Unable to fetch node symbolic links: Error " + err.Error())
+	}
+	logp.Debug("nvidiagpubeat", "NodeLinks: %v", links)
 
 	for {
 		line, err := reader.ReadString('\n')
@@ -81,10 +90,27 @@ func (g Utilization) run(cmd *exec.Cmd, gpuCount int, query string, action Actio
 		if err == io.EOF {
 			break
 		}
+
+		linkName, ok := links[gpuIndex]
+		if !ok {
+			linkName = ""
+		}
+
+		var containerName string
+
+		if linkName == "" {
+			containerName = ""
+		} else {
+			containerName = linkName[:strings.LastIndex(linkName, "-")]
+		}
+
+		containerId := GetContainerId(containerName)
 		headers := strings.Split(query, ",")
 		event := common.MapStr{
-			"gpuIndex": gpuIndex,
-			"type":     "nvidiagpubeat",
+			"linkName":    linkName,
+			"containerId": containerId,
+			"gpuIndex":    gpuIndex,
+			"type":        "nvidiagpubeat",
 		}
 		for i := 0; i < len(record); i++ {
 			value, _ := strconv.Atoi(record[i])

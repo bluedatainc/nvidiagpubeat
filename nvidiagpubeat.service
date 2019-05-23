@@ -1,0 +1,13 @@
+[Unit]
+Description=nvidiagpubeat
+Documentation=https://github.com/eBay/nvidiagpubeat
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+ExecStart=/usr/share/nvidiagpubeat/bin/nvidiagpubeat -c /etc/nvidiagpubeat/nvidiagpubeat.yml -E seccomp.enabled=false -path.home /usr/share/nvidiagpubeat -path.config /etc/nvidiagpubeat -path.data /var/lib/nvidiagpubeat -path.logs /var/log/nvidiagpubeat
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+

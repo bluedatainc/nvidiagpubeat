@@ -24,9 +24,9 @@
 
 nvidiagpubeat:
   # Defines how often an event is sent to the output
-  period: 30s
+  period: 10s
   query: "utilization.gpu,utilization.memory,memory.total,memory.free,memory.used,temperature.gpu,pstate"
-  env: "production"
+  env: "test"
   # env can be test or production. test is for test purposes to evaluate funcationality of this beat. Switch to production
   # when you want to run this beat on a Nvidia GPU machine with SMI driver installed.
 
@@ -87,9 +87,9 @@ output.elasticsearch:
 
 # Sets log level. The default log level is info.
 # Available log levels are: critical, error, warning, info, debug
-#logging.level: debug
+logging.level: debug
 
 # At debug level, you can selectively enable logging only for some components.
 # To enable all selectors use ["*"]. Examples of other selectors are "beat",
 # "publish", "service".
-#logging.selectors: ["*"]
+logging.selectors: ["*"]

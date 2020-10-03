@@ -51,7 +51,43 @@ setup.template.json.enabled: true
 setup.template.overwrite: true
 setup.template.enabled: true
 setup.template.json.path: "nvidiagpubeat.template.json"
-setup.template.json.name: "nvidiagpubeat-6.5.5"
+setup.template.json.name: "nvidiagpubeat-6.8"
+
+
+#==================== TLS/SSL setting ==========================
+
+# Use SSL settings for HTTPS. Default is true.
+ssl.enabled: true
+
+# Configure SSL verification mode. If `none` is configured, all server hosts
+# and certificates will be accepted. In this mode, SSL based connections are
+# susceptible to man-in-the-middle attacks. Use only for testing. Default is
+# `full`.
+ssl.verification_mode: none
+
+# List of supported/valid TLS versions. By default all TLS versions 1.0 up to
+# 1.2 are enabled.
+ssl.supported_protocols: [TLSv1.2]
+
+# SSL configuration. By default is off.
+# List of root certificates for HTTPS server verifications
+#ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+# Certificate for SSL client authentication
+#ssl.certificate: "/etc/pki/client/cert.pem"
+
+# Client Certificate Key
+#ssl.key: "/etc/pki/client/cert.key"
+
+# Optional passphrase for decrypting the Certificate Key.
+#ssl.key_passphrase: ''
+
+# Configure cipher suites to be used for SSL connections
+#ssl.cipher_suites: []
+
+# Configure curve types for ECDHE based cipher suites
+#ssl.curve_types: []
+
 
 #================================ Outputs =====================================
 
@@ -64,7 +100,7 @@ output.elasticsearch:
   hosts: ["localhost:9200"]
 
   # Optional protocol and basic auth credentials.
-  #protocol: "https"
+  protocol: "https"
   #username: "elastic"
   #password: "changeme"
 

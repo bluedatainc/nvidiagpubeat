@@ -1,7 +1,7 @@
 %define _build_id_links none
 Summary: nvidiagpubeat
 Name: nvidiagpubeat
-Version: 6.5.5
+Version: 6.8.0
 Release: 3
 License: Apache
 Source: %{expand:%%(pwd)}
